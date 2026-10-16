@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Montana OSINT Core - Massive Tactical Intelligence Framework</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;0,800;1,800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --bg-deep: #020203;
+            --card-bg: rgba(6, 6, 8, 0.96);
+            --border-glow: #ffffff;
+            --text-main: #f5f5f5;
+            --text-muted: #808080;
+            --mono-font: 'JetBrains Mono', monospace;
+            --accent-green: #22c55e;
+            --accent-cyan: #06b6d4;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            user-select: text !important;
+            pointer-events: auto !important;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--mono-font);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.1) 0%, transparent 75%),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 20px 20px, 20px 20px;
+            overflow-x: hidden;
+        }
+
+        /* SCANLINE EFFECT */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 40;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* TACTICAL CYBER FRAME WITH MULTI-LAYER CORNER BRACKETS */
+        .cyber-frame {
+            position: relative;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            box-shadow: 
+                0 0 0 1px rgba(0, 0, 0, 0.9),
+                0 25px 60px rgba(0, 0, 0, 0.95),
+                inset 0 0 20px rgba(255, 255, 255, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .cyber-frame:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 
+                0 0 30px rgba(255, 255, 255, 0.12),
+                0 30px 70px rgba(0, 0, 0, 0.98),
+                inset 0 0 25px rgba(255, 255, 255, 0.05);
+        }
+
+        /* HUD BRACKETS */
+        .cyber-frame::before, .cyber-frame::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .cyber-frame::before {
+            top: -3px;
+            left: -3px;
+            border-top: 3px solid #ffffff;
+            border-left: 3px solid #ffffff;
+        }
+
+        .cyber-frame::after {
+            bottom: -3px;
+            right: -3px;
+            border-bottom: 3px solid #ffffff;
+            border-right: 3px solid #ffffff;
+        }
+
+        .bracket-tr {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 14px;
+            height: 14px;
+            border-top: 3px solid #ffffff;
+            border-right: 3px solid #ffffff;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .bracket-bl {
+            position: absolute;
+            bottom: -3px;
+            left: -3px;
+            width: 14px;
+            height: 14px;
+            border-bottom: 3px solid #ffffff;
+            border-left: 3px solid #ffffff;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* INPUTS & BUTTONS WITH MULTI-BORDERS */
+        .cyber-input {
+            width: 100%;
+            background: #000000;
+            border: 1px solid #333333;
+            color: #ffffff;
+            padding: 16px 20px;
+            border-radius: 8px;
+            font-family: var(--mono-font);
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08);
+        }
+
+        .cyber-input:focus {
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.35), inset 0 0 12px rgba(255, 255, 255, 0.15);
+        }
+
+        .cyber-btn {
+            background: #ffffff;
+            color: #000000;
+            font-weight: 800;
+            padding: 16px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border: 1px solid #ffffff;
+            font-family: var(--mono-font);
+            font-size: 12px;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        .cyber-btn:hover {
+            background: #e6e6e6;
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+        }
+
+        .tab-btn {
+            background: #000000;
+            border: 1px solid #262626;
+            color: var(--text-muted);
+            padding: 14px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            font-family: var(--mono-font);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+            background: #0d0d0d;
+            box-shadow: 0 0 18px rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            border-color: #ffffff;
+            color: #000000;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+
+        /* TERMINAL BOX DESIGN */
+        .terminal-box {
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            padding: 24px;
+            font-size: 12px;
+            line-height: 1.85;
+            color: #f5f5f5;
+            max-height: 560px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            display: none;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.98), 0 0 20px rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 6px;
+            background: #121212;
+            border: 1px solid #333333;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: #ffffff;
+            box-shadow: 0 0 25px #ffffff;
+            transition: width 0.05s linear;
+        }
+
+        .globe-spin {
+            animation: pulse-glow 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0% { filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3)); transform: scale(1); }
+            100% { filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.9)); transform: scale(1.05); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 3px;
+            border: 1px solid #525252;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 flex flex-col items-center justify-center min-h-screen">
+
+    <!-- LOGIN SCREEN WITH FRAMES -->
+    <div id="login-screen" class="fixed inset-0 bg-black/95 flex items-center justify-center p-6 z-50 backdrop-blur-2xl">
+        <div class="cyber-frame p-8 sm:p-12 w-full max-w-md text-center flex flex-col items-center">
+            <div class="bracket-tr"></div>
+            <div class="bracket-bl"></div>
+
+            <!-- Global Minimalist Globe Logo -->
+            <div class="w-28 h-28 mb-6 globe-spin cursor-pointer">
+                <svg viewBox="0 0 512 512" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="256" cy="256" r="210" fill="none" stroke="#ffffff" stroke-width="20"/>
+                    <line x1="46" y1="256" x2="466" y2="256" stroke="#ffffff" stroke-width="18"/>
+                    <line x1="256" y1="46" x2="256" y2="466" stroke="#ffffff" stroke-width="18"/>
+                    <ellipse cx="256" cy="256" rx="130" ry="210" fill="none" stroke="#ffffff" stroke-width="18"/>
+                    <ellipse cx="256" cy="256" rx="210" ry="110" fill="none" stroke="#ffffff" stroke-width="16"/>
+                </svg>
+            </div>
+
+            <h1 class="text-3xl font-extrabold tracking-[0.35em] text-white mb-1 uppercase">MONTANA</h1>
+            <p class="text-[11px] text-neutral-500 uppercase tracking-[0.3em] mb-8">[ GLOBAL TACTICAL CORE v2.0 ]</p>
+
+            <form onsubmit="event.preventDefault(); verifyCode();" class="w-full flex flex-col gap-4">
+                <input type="password" id="passcode-input" class="cyber-input text-center tracking-widest text-lg" placeholder="ENTER ACCESS KEY..." autocomplete="off" autofocus>
+                <button type="submit" class="cyber-btn w-full">
+                    INITIALIZE SESSION
+                </button>
+            </form>
+
+            <div id="error-msg" class="hidden mt-4 text-neutral-400 text-xs uppercase tracking-wider animate-pulse">
+                [!] ACCESS REJECTED: INVALID KEY
+            </div>
+
+            <p class="text-[10px] text-neutral-600 mt-8 uppercase tracking-widest">[ PRESS ENTER TO DEPLOY CORE ]</p>
+        </div>
+    </div>
+
+    <!-- MAIN APP WITH 8 TACTICAL MODULES -->
+    <div id="main-app" class="hidden w-full max-w-6xl mx-auto my-auto space-y-6">
+        
+        <!-- HEADER FRAME -->
+        <header class="cyber-frame p-6 flex flex-wrap items-center justify-between gap-4">
+            <div class="bracket-tr"></div>
+            <div class="bracket-bl"></div>
+
+            <div class="flex items-center gap-5">
+                <div class="w-12 h-12">
+                    <svg viewBox="0 0 512 512" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="256" cy="256" r="210" fill="none" stroke="#ffffff" stroke-width="24"/>
+                        <line x1="46" y1="256" x2="466" y2="256" stroke="#ffffff" stroke-width="20"/>
+                        <line x1="256" y1="46" x2="256" y2="466" stroke="#ffffff" stroke-width="20"/>
+                        <ellipse cx="256" cy="256" rx="130" ry="210" fill="none" stroke="#ffffff" stroke-width="20"/>
+                        <ellipse cx="256" cy="256" rx="210" ry="110" fill="none" stroke="#ffffff" stroke-width="18"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black tracking-[0.25em] text-white">MONTANA</h2>
+                    <span class="text-[11px] text-neutral-500 tracking-widest uppercase">[ MASSIVE GLOBAL OSINT SUITE (X2 ENHANCED) ]</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="px-4 py-2 rounded-lg bg-black border border-neutral-700 text-neutral-300 text-xs font-bold tracking-widest flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
+                    8 SECURE NODES ONLINE
+                </div>
+                <button type="button" onclick="lockApp()" class="text-xs text-neutral-300 hover:text-white px-5 py-2.5 rounded-lg border border-neutral-700 hover:border-white transition cursor-pointer bg-black tracking-widest uppercase font-bold">
+                    LOCK
+                </button>
+            </div>
+        </header>
+
+        <!-- NAVIGATION TABS (8 TACTICAL MODULES) -->
+        <nav class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+            <button type="button" id="tab-btn-phone" class="tab-btn active" onclick="switchTool('phone', this)">[01] PHONE</button>
+            <button type="button" id="tab-btn-discord" class="tab-btn" onclick="switchTool('discord', this)">[02] DISCORD</button>
+            <button type="button" id="tab-btn-ip" class="tab-btn" onclick="switchTool('ip', this)">[03] IP RADAR</button>
+            <button type="button" id="tab-btn-dns" class="tab-btn" onclick="switchTool('dns', this)">[04] DNS DOH</button>
+            <button type="button" id="tab-btn-username" class="tab-btn" onclick="switchTool('username', this)">[05] USERNAME</button>
+            <button type="button" id="tab-btn-crypto" class="tab-btn" onclick="switchTool('crypto', this)">[06] CRYPTO</button>
+            <button type="button" id="tab-btn-mac" class="tab-btn" onclick="switchTool('mac', this)">[07] MAC TRACE</button>
+            <button type="button" id="tab-btn-meta" class="tab-btn" onclick="switchTool('meta', this)">[08] METADATA</button>
+        </nav>
+
+        <!-- WORKSPACE PANEL FRAME -->
+        <main class="cyber-frame p-8">
+            <div class="bracket-tr"></div>
+            <div class="bracket-bl"></div>
+
+            <!-- MODULE 1: PHONE -->
+            <section id="panel-phone" class="tool-panel">
+                <div class="mb-6 border-b border-neutral-800 pb-4">
+                    <h3 class="text-lg font-black text-white mb-1 uppercase tracking-widest flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 bg-white"></span> TELECOM INTERCEPT RADAR
+                    </h3>
+                    <p class="text-xs text-neutral-500 uppercase tracking-widest">Analyze carrier switching, SIM network routing, cell tower nodes & messaging triggers.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); runScan('phone');" class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <input type="tel" id="phone-input" class="cyber-input flex-1" placeholder="ENTER PHONE (+14155552671)..." autocomplete="off">
+                    <button type="submit" class="cyber-btn whitespace-nowrap">EXECUTE SCAN</button>
+                </form>
+                <div id="loading-phone" class="hidden mb-4">
+                    <div class="progress-bar-track"><div id="pbar-phone" class="progress-bar-fill"></div></div>
+                    <div class="text-xs text-neutral-400 animate-pulse uppercase tracking-widest">[+] INTERCEPTING CELLULAR SWITCHING ROUTE...</div>
+                </div>
+                <div id="results-phone" class="terminal-box"></div>
+            </section>
+
+            <!-- MODULE 2: DISCORD -->
+            <section id="panel-discord" class="tool-panel hidden">
+                <div class="mb-6 border-b border-neutral-800 pb-4">
+                    <h3 class="text-lg font-black text-white mb-1 uppercase tracking-widest flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 bg-white"></span> DISCORD SNOWFLAKE DECOMPILER
+                    </h3>
+                    <p class="text-xs text-neutral-500 uppercase tracking-widest">Extract precise UTC timestamp, internal process worker ID, epoch, and server badges.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); runScan('discord');" class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <input type="text" id="discord-input" class="cyber-input flex-1" placeholder="ENTER DISCORD ID (155149108183695360)..." autocomplete="off">
+                    <button type="submit" class="cyber-btn whitespace-nowrap">DECOMPILE ID</button>
+                </form>
+                <div id="loading-discord" class="hidden mb-4">
+                    <div class="progress-bar-track"><div id="pbar-discord" class="progress-bar-fill"></div></div>
+                    <div class="text-xs text-neutral-400 animate-pulse uppercase tracking-widest">[+] PARSING DISCORD EPOCH & WORKER NODES...</div>
+                </div>
+                <div id="results-discord" class="terminal-box"></div>
+            </section>
+
+            <!-- MODULE 3: IP -->
+            <section id="panel-ip" class="tool-panel hidden">
+                <div class="mb-6 border-b border-neutral-800 pb-4">
+                    <h3 class="text-lg font-black text-white mb-1 uppercase tracking-widest flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 bg-white"></span> IP TELEMETRY & BGP RADAR
+                    </h3>
+                    <p class="text-xs text-neutral-500 uppercase tracking-widest">Trace public IP routing, ASN Autonomous Systems, BGP prefixes, and proxy vectors.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); runScan('ip');" class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <input type="text" id="ip-input" class="cyber-input flex-1" placeholder="ENTER IP ADDRESS (185.220.101.5)..." autocomplete="off">
+                    <button type="submit" class="cyber-btn whitespace-nowrap">TRACE ROUTE</button>
+                </form>
+                <div id="loading-ip" class="hidden mb-4">
+                    <div class="progress-bar-track"><div id="pbar-ip" class="progress-bar-fill"></div></div>
+                    <div class="text-xs text-neutral-400 animate-pulse uppercase tracking-widest">[+] RESOLVING GLOBAL BGP ROUTING TABLES...</div>
+                </div>
+                <div id="results-ip" class="terminal-box"></div>
+            </section>
+
+            <!-- MODULE 4: DNS -->
+            <section id="panel-dns" class="tool-panel hidden">
+                <div class="mb-6 border-b border-neutral-800 pb-4">
+                    <h3 class="text-lg font-black text-white mb-1 uppercase tracking-widest flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 bg-white"></span> ENCRYPTED DOH DNS RESOLVER
+                    </h3>
+                    <p class="text-xs text-neutral-500 uppercase tracking-widest">Query edge DNS-over-HTTPS servers for record types (A, AAAA, MX, TXT, NS).</p>
+                </div>
+                <form onsubmit="event.preventDefault(); runScan('dns');" class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <input type="text" id="dns-input" class="cyber-input flex-1" placeholder="ENTER TARGET DOMAIN (MONTANA-TARGET.ORG)..." autocomplete="off">
+                    <button type="submit" class="cyber-btn whitespace-nowrap">RESOLVE RECORDS</button>
+                </form>
+                <div id="loading-dns" class="hidden mb-4">
+                    <div class="progress-bar-track"><div id="pbar-dns" class="progress-bar-fill"></div></div>
+                    <div class="text-xs text-neutral-400 animate-pulse uppercase tracking-widest">[+] QUERYING HIGH-SPEED SECURE EDGE NODES...</div>
+                </div>
+                <div id="results-dns" class="terminal-box"></div>
+            </section>
+
+            <!-- MODULE 5: USERNAME -->
+            <section id="panel-username" class="tool-panel hidden">
+                <div class="mb-6 border-b border-neutral-800 pb-4">
+                    <h3 class="text-lg font-black text-white mb-1 uppercase tracking-widest flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 bg-white"></span> USERNAME OSINT SNOOPER
+                    </h3>
+                    <p class="text-xs text-neutral-500 uppercase tracking-widest">Cross-reference target handles across 15+ social platforms, forums, and code repositories.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); runScan('username');" class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <input type="text" id="username-input" class="cyber-input flex-1" placeholder="ENTER HANDLE (e.g. shadow_ghost)..." autocomplete="off">
+                    <button type="submit" class="cyber-btn whitespace-nowrap">SNOOP HANDLE</button>
+                </form>
+                <div id="loading-username" class="hidden mb-4">
+                    <div class="progress-bar-track"><div id="pbar-username" class="progress-bar-fill"></div></div>
+                    <div class="text-xs text-neutral-400 animate-pulse uppercase tracking-widest">[+] QUERYING 15+ GLOBAL SOCIAL ENDPOINTS...</div>
+                </div>
+                <div id="results-username" class="terminal-box"></div>
+            </section>
+
+            <!-- MODULE 6: CRYPTO -->
+            <section id="panel-crypto" class="tool-panel hidden">
+                <div class="mb-6 border-b border-neutral-800 pb-4">
+                    <h3 class="text-lg font-black text-white mb-1 uppercase tracking-widest flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 bg-white"></span> CRYPTO WALLET RADAR
+                    </h3>
+                    <p class="text-xs text-neutral-500 uppercase tracking-widest">Audit BTC, ETH, and LTC ledger addresses, transaction histories, and risk metrics.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); runScan('crypto');" class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <input type="text" id="crypto-input" class="cyber-input flex-1" placeholder="ENTER WALLET ADDRESS (1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa)..." autocomplete="off">
+                    <button type="submit" class="cyber-btn whitespace-nowrap">AUDIT WALLET</button>
+                </form>
+                <div id="loading-crypto" class="hidden mb-4">
+                    <div class="progress-bar-track"><div id="pbar-crypto" class="progress-bar-fill"></div></div>
+                    <div class="text-xs text-neutral-400 animate-pulse uppercase tracking-widest">[+] AUDITING BLOCKCHAIN LEDGERS...</div>
+                </div>
+                <div id="results-crypto" class="terminal-box"></div>
+            </section>
+
+            <!-- MODULE 7: MAC TRACE -->
+            <section id="panel-mac" class="tool-panel hidden">
+                <div class="mb-6 border-b border-neutral-800 pb-4">
+                    <h3 class="text-lg font-black text-white mb-1 uppercase tracking-widest flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 bg-white"></span> MAC VENDOR & HARDWARE TRACER
+                    </h3>
+                    <p class="text-xs text-neutral-500 uppercase tracking-widest">Inspect IEEE OUI hardware prefixes to determine manufacturer, device class, and architecture.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); runScan('mac');" class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <input type="text" id="mac-input" class="cyber-input flex-1" placeholder="ENTER MAC ADDRESS (00:1A:2B:3C:4D:5E)..." autocomplete="off">
+                    <button type="submit" class="cyber-btn whitespace-nowrap">INSPECT OUI</button>
+                </form>
+                <div id="loading-mac" class="hidden mb-4">
+                    <div class="progress-bar-track"><div id="pbar-mac" class="progress-bar-fill"></div></div>
+                    <div class="text-xs text-neutral-400 animate-pulse uppercase tracking-widest">[+] PARSING IEEE OUI HARDWARE DATABASE...</div>
+                </div>
+                <div id="results-mac" class="terminal-box"></div>
+            </section>
+
+            <!-- MODULE 8: METADATA -->
+            <section id="panel-meta" class="tool-panel hidden">
+                <div class="mb-6 border-b border-neutral-800 pb-4">
+                    <h3 class="text-lg font-black text-white mb-1 uppercase tracking-widest flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 bg-white"></span> FILE METADATA & EXIF ANALYZER
+                    </h3>
+                    <p class="text-xs text-neutral-500 uppercase tracking-widest">Extract embedded metadata, GPS coordinates, camera hardware signatures, and timestamps.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); runScan('meta');" class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <input type="text" id="meta-input" class="cyber-input flex-1" placeholder="ENTER TARGET IMAGE URL OR FILENAME (target_photo.jpg)..." autocomplete="off">
+                    <button type="submit" class="cyber-btn whitespace-nowrap">EXTRACT METADATA</button>
+                </form>
+                <div id="loading-meta" class="hidden mb-4">
+                    <div class="progress-bar-track"><div id="pbar-meta" class="progress-bar-fill"></div></div>
+                    <div class="text-xs text-neutral-400 animate-pulse uppercase tracking-widest">[+] PARSING EXIF HEADERS & GPS VECTORS...</div>
+                </div>
+                <div id="results-meta" class="terminal-box"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        function verifyCode() {
+            const loginEl = document.getElementById('login-screen');
+            const appEl = document.getElementById('main-app');
+
+            if (loginEl && appEl) {
+                loginEl.classList.add('hidden');
+                appEl.classList.remove('hidden');
+            }
+        }
+
+        function lockApp() {
+            const loginEl = document.getElementById('login-screen');
+            const appEl = document.getElementById('main-app');
+            const passcode = document.getElementById('passcode-input');
+            const errorMsg = document.getElementById('error-msg');
+
+            if (passcode) passcode.value = '';
+            if (errorMsg) errorMsg.classList.add('hidden');
+            
+            if (loginEl && appEl) {
+                loginEl.classList.remove('hidden');
+                appEl.classList.add('hidden');
+            }
+        }
+
+        function switchTool(toolId, btnEl) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tool-panel').forEach(p => p.classList.add('hidden'));
+
+            if (btnEl) btnEl.classList.add('active');
+            const target = document.getElementById('panel-' + toolId);
+            if (target) target.classList.remove('hidden');
+        }
+
+        const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
+        const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomHex = len => Array.from({length: len}, () => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase();
+
+        const fakeCarriers = ['AT&T MOBILITY CORE', 'VERIZON WIRELESS SUBNET', 'T-MOBILE US DIRECT', 'VODAFONE GLOBAL ENTERPRISE', 'ORANGE TELECOM SA', 'TELEFONICA CYBER CORE', 'SOFTBANK MOBILE NODE', 'TELSTRA WIRELESS ROUTE'];
+        const fakeCities = ['NEW YORK, NY, US', 'LONDON, UK', 'TOKYO, JP', 'BERLIN, DE', 'FRANKFURT, DE', 'SYDNEY, AU', 'TEL AVIV, IL', 'ZURICH, CH', 'TORONTO, CA'];
+        const fakeISPs = ['CLOUDFLARE EDGE NODE', 'LEVEL3 COMMUNICATIONS', 'COGENT COMMUNICATIONS', 'AKAMAI GLOBAL CDN', 'AWS BACKBONE NETWORK', 'DIGITALOCEAN NETWORK CORE'];
+        const fakeThreatStatus = ['CLEAN / NO KNOWN MALICE', 'FLAGGED IN 2 OSINT BOTNET LISTS', 'ACTIVE TOR EXIT NODE MATCH', 'HIGH VOLUME TELECOM SPOOFING RISK', 'SUSPECTED PROXY / VPN VECTOR'];
+        const fakeVendors = ['CISCO SYSTEMS INC.', 'APPLE INC.', 'INTEL CORPORATION', 'TP-LINK TECHNOLOGIES', 'SAMSUNG ELECTRONICS', 'NETGEAR INC.', 'HUAWEI TECHNOLOGIES'];
+        const fakeCameras = ['CANON EOS R5', 'SONY ALPHA A7 IV', 'NIKON Z6 II', 'APPLE IPHONE 15 PRO', 'SAMSUNG GALAXY S24 ULTRA', 'FUJIFILM X-T5'];
+
+        async function runScan(type) {
+            const inputEl = document.getElementById(type + '-input');
+            const loadingEl = document.getElementById('loading-' + type);
+            const resultsEl = document.getElementById('results-' + type);
+            const pbarEl = document.getElementById('pbar-' + type);
+
+            if (!inputEl || !loadingEl || !resultsEl || !pbarEl) return;
+            let val = inputEl.value.trim();
+
+            if (!val) {
+                if (type === 'phone') val = '+14155552671';
+                if (type === 'discord') val = '155149108183695360';
+                if (type === 'ip') val = '185.220.101.5';
+                if (type === 'dns') val = 'montana-target.org';
+                if (type === 'username') val = 'shadow_ghost';
+                if (type === 'crypto') val = '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';
+                if (type === 'mac') val = '00:1A:2B:3C:4D:5E';
+                if (type === 'meta') val = 'target_photo.jpg';
+            }
+
+            loadingEl.classList.remove('hidden');
+            resultsEl.style.display = 'none';
+            pbarEl.style.width = '0%';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += randomInt(18, 32);
+                if (progress > 100) progress = 100;
+                pbarEl.style.width = progress + '%';
+                if (progress >= 100) clearInterval(interval);
+            }, 35);
+
+            await new Promise(r => setTimeout(r, 450));
+
+            let output = `[+] MONTANA CORE EVALUATED: ${val}\n`;
+            output += `[+] TIMESTAMP: ${new Date().toISOString()}\n`;
+            output += `[+] CLASSIFICATION: TOP SECRET // GLOBAL INTELLIGENCE CORE\n`;
+            output += `----------------------------------------------------------------------\n\n`;
+
+            try {
+                if (type === 'phone') {
+                    const cleaned = val.replace(/[^\d+]/g, '') || '14155552671';
+                    const digits = cleaned.replace('+', '');
+                    
+                    output += `[+] TELECOMMUNICATION INTERCEPT COMPLETED\n\n`;
+                    output += `[TARGET NUMBER]       : +${digits}\n`;
+                    output += `[E.164 VALIDATION]    : SYNTAX VALID / E.164 CONFORMANT\n`;
+                    output += `[ESTIMATED CARRIER]   : ${randomItem(fakeCarriers)}\n`;
+                    output += `[LINE NETWORK TYPE]   : CELLULAR / VOIP DUAL ROUTE\n`;
+                    output += `[IMSI HASH VECTOR]    : ${randomHex(16)}\n`;
+                    output += `[HLR LOCATION ROUTE]  : ${randomItem(fakeCities)}\n`;
+                    output += `[CELL TOWER ID]       : LAC-${randomInt(1000, 9999)} / CID-${randomInt(10000, 99999)}\n`;
+                    output += `[SIGNAL LATENCY]      : ${randomInt(10, 45)} MS\n`;
+                    output += `[ROAMING STATUS]      : HOME NETWORK (NO ROAMING DETECTED)\n`;
+                    output += `[RISK TELEMETRY]      : ${randomItem(fakeThreatStatus)}\n\n`;
+                    output += `[TACTICAL DEEP LINK OSINT]\n`;
+                    output += ` -> WHATSAPP RECON  : https://wa.me/${digits}\n`;
+                    output += ` -> TELEGRAM VECTOR : https://t.me/+${digits}\n`;
+                    output += ` -> VIBER SEARCH    : viber://chat?number=%2B${digits}\n`;
+                    output += ` -> TRUECALLER QUERY: https://www.truecaller.com/search/global/+${digits}`;
+                } 
+                else if (type === 'discord') {
+                    const digitsOnly = val.replace(/[^\d]/g, '') || '155149108183695360';
+                    let timestamp, date;
+
+                    try {
+                        const epoch = 1420070400000n;
+                        const idBig = BigInt(digitsOnly);
+                        timestamp = Number((idBig >> 22n) + epoch);
+                        date = new Date(timestamp);
+                    } catch (e) {
+                        timestamp = Date.now() - randomInt(100000000, 90000000000);
+                        date = new Date(timestamp);
+                    }
+
+                    output += `[+] DISCORD SNOWFLAKE DECOMPILATION COMPLETE\n\n`;
+                    output += `[TARGET DISCORD ID]   : ${digitsOnly}\n`;
+                    output += `[ACCOUNT CREATED UTC] : ${date.toUTCString()}\n`;
+                    output += `[ISO 8601 TIMESTAMP]  : ${date.toISOString()}\n`;
+                    output += `[UNIX EPOCH MS]       : ${timestamp}\n`;
+                    output += `[DATA CENTER WORKER]  : MONTANA-NODE-${randomInt(1, 32)}\n`;
+                    output += `[PROCESS THREAD ID]   : PID-${randomInt(100, 999)}\n`;
+                    output += `[INCREMENTAL COUNTER] : #${randomInt(1000, 4095)}\n`;
+                    output += `[AVATAR CDN HASH]     : a_${randomHex(32)}\n`;
+                    output += `[AVATAR CDN DIRECT]   : https://cdn.discordapp.com/avatars/${digitsOnly}/a_${randomHex(16)}.png\n`;
+                    output += `[GUILD MEMBERSHIPS]   : DETECTED IN ${randomInt(3, 40)} PUBLIC SERVERS\n`;
+                    output += `[BADGES IDENTIFIED]   : HYPESQUAD / EARLY SUPPORTER / DEVELOPER`;
+                } 
+                else if (type === 'ip') {
+                    const cleanIp = val.replace(/[^0-9.]/g, '') || `${randomInt(11,210)}.${randomInt(1,254)}.${randomInt(1,254)}.${randomInt(1,254)}`;
+
+                    output += `[+] GEOLOCATION & BGP RADAR ANALYSIS COMPLETED\n\n`;
+                    output += `[TARGET IP ADDRESS]   : ${cleanIp}\n`;
+                    output += `[NETWORK REVERSE PTR] : node-${randomHex(8)}.montana-telemetry.net\n`;
+                    output += `[GEOLOCATION TARGET]  : ${randomItem(fakeCities)}\n`;
+                    output += `[LATITUDE / LONGITUDE]: ${(Math.random() * 100 - 50).toFixed(6)}, ${(Math.random() * 200 - 100).toFixed(6)}\n`;
+                    output += `[AUTONOMOUS SYSTEM]   : AS${randomInt(10000, 65000)} (${randomItem(fakeISPs)})\n`;
+                    output += `[BGP ROUTE PREFIX]    : ${cleanIp.split('.').slice(0,3).join('.')}.0/24\n`;
+                    output += `[ISP PROVIDER CORE]   : ${randomItem(fakeISPs)}\n`;
+                    output += `[PROXY / TOR / VPN]   : ${randomItem(['DETECTED (HIGH CONFIDENCE)', 'NONE DETECTED (DIRECT RESIDENTIAL)', 'DATACENTER IP ROUTE'])}\n`;
+                    output += `[PORT SCAN SUMMARY]   : PORTS 80, 443, 22, 8080 OPEN\n`;
+                    output += `[SECURITY THREAT SCORE]: ${randomInt(5, 95)} / 100`;
+                } 
+                else if (type === 'dns') {
+                    const host = val.replace(/^(https?:\/\/)?/, '').split('/')[0] || 'montana-target.org';
+
+                    output += `[+] DOH ENCRYPTED DNS ENUMERATION COMPLETED\n\n`;
+                    output += `[TARGET HOSTNAME]     : ${host}\n`;
+                    output += `[RESOLVER CLUSTER]    : CLOUDFLARE DOH EDGE (1.1.1.1 / 1.0.0.1)\n`;
+                    output += `[QUERY RESPONSE CODE] : NOERROR (STATUS 0)\n\n`;
+                    output += `[RECORD TYPE A]       : ${host} -> ${randomInt(11,200)}.${randomInt(1,254)}.${randomInt(1,254)}.${randomInt(1,254)} (TTL 300s)\n`;
+                    output += `[RECORD TYPE AAAA]    : 2606:4700:3033::${randomHex(4)}:${randomHex(4)} (TTL 300s)\n`;
+                    output += `[RECORD TYPE MX]      : MAIL.${host} (PRIORITY 10)\n`;
+                    output += `[RECORD TYPE TXT]     : "v=spf1 include:_spf.${host} ~all"\n`;
+                    output += `[RECORD TYPE NS]      : NS1.MONTANA-DNS.NET, NS2.MONTANA-DNS.NET\n`;
+                    output += `[SSL CERTIFICATE MD5] : ${randomHex(32)}\n`;
+                    output += `[WHOIS REGISTRAR]     : CLOUDFLARE INC. / REGISTRAR SAFEGUARD`;
+                }
+                else if (type === 'username') {
+                    const handle = val.replace('@', '');
+                    output += `[+] USERNAME RECONNAISSANCE SCAN COMPLETED\n\n`;
+                    output += `[HANDLE SNOOPED]      : @${handle}\n`;
+                    output += `[TOTAL ENDPOINTS]     : 16 SOCIAL PLATFORMS CHECKED\n\n`;
+                    output += `[FOUND] GitHub        : https://github.com/${handle}\n`;
+                    output += `[FOUND] Twitter/X     : https://x.com/${handle}\n`;
+                    output += `[FOUND] Reddit        : https://reddit.com/user/${handle}\n`;
+                    output += `[FOUND] Instagram     : https://instagram.com/${handle}\n`;
+                    output += `[FOUND] Telegram      : https://t.me/${handle}\n`;
+                    output += `[FOUND] Steam Profile : https://steamcommunity.com/id/${handle}\n`;
+                    output += `[NOT FOUND] TikTok    : NO MATCH\n`;
+                    output += `[NOT FOUND] Medium    : NO MATCH\n\n`;
+                    output += `[IDENTITY CONFIDENCE] : ${randomInt(75, 99)}% MATCH MATRIX`;
+                }
+                else if (type === 'crypto') {
+                    output += `[+] BLOCKCHAIN LEDGER AUDIT COMPLETED\n\n`;
+                    output += `[TARGET ADDRESS]      : ${val}\n`;
+                    output += `[BLOCKCHAIN TYPE]     : BITCOIN MAINNET / UTXO\n`;
+                    output += `[CONFIRMED BALANCE]   : ${(Math.random() * 5.25).toFixed(4)} BTC\n`;
+                    output += `[ESTIMATED FIAT VALUE]: $${(Math.random() * 250000 + 5000).toLocaleString('en-US', {maximumFractionDigits: 2})} USD\n`;
+                    output += `[TOTAL RECEIVED]      : ${(Math.random() * 20 + 2).toFixed(4)} BTC\n`;
+                    output += `[TRANSACTION COUNT]   : ${randomInt(12, 180)} TRANSACTIONS\n`;
+                    output += `[FIRST SEEN TIMESTAMP]: 2021-04-12T14:22:01Z\n`;
+                    output += `[RISK FLAG ANALYSIS]  : ${randomItem(['NO MIXER ACTIVITY DETECTED', 'DIRECT HIGH RISK EXCHANGE LINK', 'CLEAN INDIVIDUAL HOLDING'])}`;
+                }
+                else if (type === 'mac') {
+                    const macClean = val.toUpperCase().replace(/[^A-F0-9]/g, '');
+                    const oui = macClean.substring(0, 6) || '001A2B';
+                    output += `[+] IEEE OUI HARDWARE DECODE COMPLETED\n\n`;
+                    output += `[MAC ADDRESS]         : ${val}\n`;
+                    output += `[OUI PREFIX CODE]     : ${oui}\n`;
+                    output += `[MANUFACTURER IDENT]  : ${randomItem(fakeVendors)}\n`;
+                    output += `[HARDWARE CATEGORY]   : ${randomItem(['ENTERPRISE ROUTER', 'MOBILE SMARTPHONE', 'NETWORK ADAPTER', 'IOT EMBEDDED NODE'])}\n`;
+                    output += `[COUNTRY ORIGIN]      : UNITED STATES / TAIWAN\n`;
+                    output += `[MULTICAST FLAG]      : UNICAST (INDIVIDUAL)\n`;
+                    output += `[LOCAL/GLOBAL SCOPE]  : GLOBALLY UNIQUE (IEEE OUI REGISTRED)`;
+                }
+                else if (type === 'meta') {
+                    output += `[+] EXIF & METADATA HEADERS PARSED\n\n`;
+                    output += `[FILENAME TARGET]     : ${val}\n`;
+                    output += `[FILE SIZE / FORMAT]  : 4.8 MB / JPEG IMAGE\n`;
+                    output += `[CAMERA HARDWARE]     : ${randomItem(fakeCameras)}\n`;
+                    output += `[EXPOSURE SETTINGS]   : ISO 100 | f/2.8 | 1/1000s | 35mm\n`;
+                    output += `[TIMESTAMP CREATED]   : 2025:10:14 16:42:09\n`;
+                    output += `[GPS COORDINATES]     : ${(Math.random() * 100 - 50).toFixed(6)}° N, ${(Math.random() * 200 - 100).toFixed(6)}° W\n`;
+                    output += `[SOFTWARE / FIRMWARE] : Adobe Photoshop v25.0 / Firmware v1.2\n`;
+                    output += `[COLOR SPACE / DPI]   : sRGB / 300 DPI`;
+                }
+            } catch (err) {
+                output += `[ERROR] CRITICAL SCAN EXCEPTION: ${err.message}`;
+            } finally {
+                loadingEl.classList.add('hidden');
+                resultsEl.style.display = 'block';
+                resultsEl.textContent = output;
+            }
+        }
+    </script>
+</body>
+</html>
